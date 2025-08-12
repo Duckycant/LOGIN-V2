@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Hacker Login — Demo (admin / Andro)</title>
+<title>Hacker Login — Demo (admin / Andro, admin / Ryan)</title>
 <style>
 :root{
   --bg:#030405;
@@ -91,16 +91,21 @@ button.primary{background:linear-gradient(90deg, rgba(0,255,127,0.06), rgba(0,25
 
 <script>
 const DEMO_ACCOUNT_KEY = 'demo_account_v1';
-function ensureDemoAccount(){
+function ensureDemoAccounts(){
   const stored = localStorage.getItem(DEMO_ACCOUNT_KEY);
   if(stored) return JSON.parse(stored);
-  const account = { user: 'admin', pass: 'Andro' };
-  const account = { user: 'admin', pass: 'Ryan' };
-  const account = { user: 'admin', pass: 'venstein' };
-  localStorage.setItem(DEMO_ACCOUNT_KEY, JSON.stringify(account));
-  return account;
+
+  // Multiple accounts stored in an array
+  const accounts = [
+    { user: 'admin', pass: 'Andro' },
+    { user: 'admin', pass: 'Ryan' },
+    { user: 'admin', pass: 'venstein' }
+  ];
+
+  localStorage.setItem(DEMO_ACCOUNT_KEY, JSON.stringify(accounts));
+  return accounts;
 }
-const demoAccount = ensureDemoAccount();
+const demoAccounts = ensureDemoAccounts();
 
 const user = document.getElementById('user');
 const pass = document.getElementById('pass');
@@ -166,8 +171,10 @@ function fakeAuth(username, password){
 
   setTimeout(async () => {
     const took = Math.round(Date.now()-start);
-    const success = username === demoAccount.user && password === demoAccount.pass;
     const location = await getLocation();
+
+    // Check if any account matches
+    const success = demoAccounts.some(acc => acc.user === username && acc.pass === password);
 
     if(success){
       let countdown = 5;
@@ -236,4 +243,3 @@ animate();
 </script>
 </body>
 </html>
-
