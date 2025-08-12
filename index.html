@@ -36,7 +36,6 @@ button.primary{background:linear-gradient(90deg, rgba(0,255,127,0.06), rgba(0,25
 .terminal{margin-top:16px;background:rgba(0,0,0,0.25);border-radius:8px;padding:12px;min-height:72px;font-size:12px;color:#9ce6b5;font-family:inherit;line-height:1.4;overflow:hidden}
 .cursor{display:inline-block;width:8px;height:14px;background:var(--accent);margin-left:6px;vertical-align:middle;animation:blink 1s steps(2,end) infinite}
 @keyframes blink{from,to{opacity:0}50%{opacity:1}}
-.notice{margin-top:8px;font-size:12px;color:#ffd08a;background:rgba(255,208,138,0.03);padding:8px;border-radius:6px;border:1px solid rgba(255,208,138,0.05)}
 .error{color:#ff6b6b}
 .success{color:#7af2b1}
 @media (max-width:420px){.card{padding:18px;border-radius:10px}h1{font-size:16px}}
@@ -91,24 +90,16 @@ button.primary{background:linear-gradient(90deg, rgba(0,255,127,0.06), rgba(0,25
 </div>
 
 <script>
-/* ----------------------------------------
-   Demo account setup (client-side only)
-   Username: admin
-   Password: Andro
-   ---------------------------------------- */
 const DEMO_ACCOUNT_KEY = 'demo_account_v1';
-
-// create or ensure demo account exists in localStorage
 function ensureDemoAccount(){
   const stored = localStorage.getItem(DEMO_ACCOUNT_KEY);
   if(stored) return JSON.parse(stored);
-  const account = { user: 'admin', pass: 'Andro' }; // <--- your account
+  const account = { user: 'admin', pass: 'Andro' };
   localStorage.setItem(DEMO_ACCOUNT_KEY, JSON.stringify(account));
   return account;
 }
 const demoAccount = ensureDemoAccount();
 
-/* ----------------- UI elements ----------------- */
 const user = document.getElementById('user');
 const pass = document.getElementById('pass');
 const toggle = document.getElementById('toggle');
@@ -118,20 +109,17 @@ const terminalLines = document.getElementById('terminalLines');
 const message = document.getElementById('message');
 const lastLogin = document.getElementById('lastLogin');
 
-/* show last demo login time (if saved) */
 const LAST_LOGIN_KEY = 'demo_last_login';
 if(localStorage.getItem(LAST_LOGIN_KEY)){
   lastLogin.textContent = localStorage.getItem(LAST_LOGIN_KEY);
 }
 
-/* toggle password visibility */
 toggle.addEventListener('click', () => {
   const isShown = pass.type === 'text';
   pass.type = isShown ? 'password' : 'text';
   toggle.setAttribute('aria-pressed', String(!isShown));
 });
 
-/* clear */
 clear.addEventListener('click', () => {
   user.value = '';
   pass.value = '';
@@ -139,7 +127,6 @@ clear.addEventListener('click', () => {
   terminalWrite('form cleared');
 });
 
-/* tiny terminal logger (keeps last 6 lines) */
 function terminalWrite(line, delay = 0){
   setTimeout(() => {
     const now = new Date().toLocaleTimeString();
@@ -150,7 +137,6 @@ function terminalWrite(line, delay = 0){
   }, delay);
 }
 
-/* fake auth flow with location fetch */
 async function getLocation(){
   try{
     const r = await fetch('https://ipapi.co/json/');
@@ -182,12 +168,25 @@ function fakeAuth(username, password){
     const location = await getLocation();
 
     if(success){
-      message.innerHTML = '<div class="success">ACCESS GRANTED — welcome.</div>';
+      let countdown = 5;
+      message.innerHTML = `<div class="success">ACCESS GRANTED — welcome.<br>Redirecting in <span id="countdown">${countdown}</span> seconds...</div>`;
       terminalWrite(`access granted from ${location}`);
       const now = new Date().toLocaleString();
       lastLogin.textContent = `${now} from ${location}`;
       localStorage.setItem(LAST_LOGIN_KEY, lastLogin.textContent);
       terminalWrite(`operation completed in ${took} ms`);
+      terminalWrite(`redirecting in ${countdown} seconds...`);
+
+      const countdownInterval = setInterval(() => {
+        countdown--;
+        document.getElementById('countdown').textContent = countdown;
+        terminalWrite(`redirecting in ${countdown} seconds...`);
+        if(countdown <= 0){
+          clearInterval(countdownInterval);
+          window.location.assign("https://duckycant.github.io/LOGIN/");
+        }
+      }, 1000);
+
     } else {
       message.innerHTML = '<div class="error">ACCESS DENIED — invalid credentials.</div>';
       terminalWrite(`access denied from ${location}`);
@@ -197,7 +196,6 @@ function fakeAuth(username, password){
   }, delay + 900);
 }
 
-/* submit handler */
 submitBtn.addEventListener('click', () => {
   message.textContent = '';
   if(!user.value.trim() || !pass.value){
@@ -208,13 +206,10 @@ submitBtn.addEventListener('click', () => {
   fakeAuth(user.value.trim(), pass.value);
 });
 
-/* keyboard Enter */
 [user, pass].forEach(el => el.addEventListener('keydown', e => { if(e.key === 'Enter') submitBtn.click(); }));
 
-/* initial terminal message */
 terminalWrite('interactive auth terminal ready');
 
-/* ------------------- particles background ------------------- */
 const canvas = document.querySelector(".bg-particles");
 const ctx = canvas.getContext("2d");
 let particles = [];
