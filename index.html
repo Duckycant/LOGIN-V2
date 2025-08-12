@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Hacker Login — Demo (admin / Andro, admin / Ryan)</title>
+<title>Hacker Login — Demo (admin / Andro, admin / Ryan, admin / Venstein)</title>
 <style>
 :root{
   --bg:#030405;
@@ -52,10 +52,9 @@ button.primary{background:linear-gradient(90deg, rgba(0,255,127,0.06), rgba(0,25
       <div class="badge">ALPHA</div>
       <div>
         <h1 id="loginTitle">ACCESS PORTAL</h1>
-        <p class="lead">Enter credentials to proceed. Demo only — not secure.</p>
+        <p class="lead">Enter credentials to proceed. admin only — DONT TRY TO GO IN.</p>
       </div>
     </div>
-
     <form id="loginForm" autocomplete="off" onsubmit="return false;">
       <div>
         <label for="user">USERNAME</label>
@@ -63,15 +62,13 @@ button.primary{background:linear-gradient(90deg, rgba(0,255,127,0.06), rgba(0,25
           <input id="user" name="user" type="text" placeholder="root" required />
         </div>
       </div>
-
       <div>
         <label for="pass">PASSWORD</label>
         <div class="field">
           <input id="pass" name="pass" type="password" placeholder="• • • • • •" required />
-          <button type="button" id="toggle" title="Show / hide password" aria-pressed="false">👁</button>
+          <button type="button" id="toggle" title="Show / hide password" aria-pressed="false"></button>
         </div>
       </div>
-
       <div class="actions">
         <div class="small">Last login: <span id="lastLogin">—</span></div>
         <div style="display:flex; gap:8px;">
@@ -79,9 +76,7 @@ button.primary{background:linear-gradient(90deg, rgba(0,255,127,0.06), rgba(0,25
           <button type="submit" class="primary" id="submitBtn">Authenticate</button>
         </div>
       </div>
-
       <div id="message" aria-live="polite"></div>
-
       <div class="terminal" id="terminal">
         <div id="terminalLines">&gt; waiting for user input<span class="cursor" aria-hidden="true"></span></div>
       </div>
@@ -90,18 +85,15 @@ button.primary{background:linear-gradient(90deg, rgba(0,255,127,0.06), rgba(0,25
 </div>
 
 <script>
-const DEMO_ACCOUNT_KEY = 'demo_account_v1';
-function ensureDemoAccounts(){
+const DEMO_ACCOUNT_KEY = 'demo_accounts_v1';
+function ensureDemoAccounts() {
   const stored = localStorage.getItem(DEMO_ACCOUNT_KEY);
-  if(stored) return JSON.parse(stored);
-
-  // Multiple accounts stored in an array
+  if (stored) return JSON.parse(stored);
   const accounts = [
     { user: 'admin', pass: 'Andro' },
     { user: 'admin', pass: 'Ryan' },
-    { user: 'admin', pass: 'venstein' }
+    { user: 'admin', pass: 'Venstein' } // ✅ Added Venstein account
   ];
-
   localStorage.setItem(DEMO_ACCOUNT_KEY, JSON.stringify(accounts));
   return accounts;
 }
@@ -171,10 +163,8 @@ function fakeAuth(username, password){
 
   setTimeout(async () => {
     const took = Math.round(Date.now()-start);
+    const success = demoAccounts.some(acc => username === acc.user && password === acc.pass);
     const location = await getLocation();
-
-    // Check if any account matches
-    const success = demoAccounts.some(acc => acc.user === username && acc.pass === password);
 
     if(success){
       let countdown = 5;
@@ -195,7 +185,6 @@ function fakeAuth(username, password){
           window.location.assign("https://duckycant.github.io/LOGIN/");
         }
       }, 1000);
-
     } else {
       message.innerHTML = '<div class="error">ACCESS DENIED — invalid credentials.</div>';
       terminalWrite(`access denied from ${location}`);
