@@ -95,6 +95,8 @@ function ensureDemoAccount(){
   const stored = localStorage.getItem(DEMO_ACCOUNT_KEY);
   if(stored) return JSON.parse(stored);
   const account = { user: 'admin', pass: 'Andro' };
+  const account = { user: 'admin', pass: 'Ryan' };
+  const account = { user: 'admin', pass: 'venstein' };
   localStorage.setItem(DEMO_ACCOUNT_KEY, JSON.stringify(account));
   return account;
 }
@@ -234,3 +236,4 @@ animate();
 </script>
 </body>
 </html>
+
